@@ -12,6 +12,29 @@ import os
 import glob
 
 
+def get_rotation_around_axis(angle, axis, units="rad"):
+    """ return the rotation matrix corresponding to a rotation "angle"
+        around X, Y or Z """
+    if units == "deg":
+        a = np.deg2rad(angle)
+    elif units == "rad":
+        a = angle
+    if axis in "xX":
+        return np.array([[1, 0, 0],
+                         [0, np.cos(a), -np.sin(a)],
+                         [0, np.sin(a), np.cos(a)]])
+    elif axis in "yY":
+        return np.array([[np.cos(a), 0, np.sin(a)],
+                         [0, 1, 0],
+                         [-np.sin(a), 0, np.cos(a)]])
+    elif axis in "zZ":
+        return np.array([[np.cos(a), -np.sin(a), 0],
+                         [np.sin(a), np.cos(a), 0],
+                         [0, 0, 1]])
+    else:
+        print("Axis should be X, Y or Z")
+
+
 def load_detections_2d(filename, image_name):
     """ Load the detections found for an image. It creates a dict
         with labels as keys and a list of bounding boxes as values """
@@ -72,11 +95,12 @@ def assign_labels(pts, T_lidar_to_cam, P_cam, w, h, detections_2d, labels_to_kee
                                     np.intersect1d(i0, i1),
                                     np.intersect1d(i2, i3)),
                                 filter_in_front)
-                d = pts_cam[inside_bb_idx, 2]
-                d_ref = np.percentile(d, 25)
-                filt = np.where(abs(pts_cam[:, 2]-d_ref) < 2)[0]
-                good_points = np.intersect1d(filt, inside_bb_idx)
-                labels[good_points] = v
+                if len(inside_bb_idx) > 5:
+                    d = pts_cam[inside_bb_idx, 2]
+                    d_ref = np.percentile(d, 25)
+                    filt = np.where(abs(pts_cam[:, 2]-d_ref) < 2)[0]
+                    good_points = np.intersect1d(filt, inside_bb_idx)
+                    labels[good_points] = v
     return labels
 
 
@@ -93,7 +117,7 @@ P_cam = np.array([[7.215377e+02, 0.000000e+00, 6.095593e+02, 4.485728e+01],
 
 if __name__ == '__main__':
     # example
-    working_dir = "/home/matthieu/Downloads/2011_09_26/2011_09_26_drive_0035_sync/"
+    working_dir = "/media/matthieu/DATA/KITTI/2011_09_26_drive_0039_sync/"
 
     # images
     images_list = glob.glob(os.path.join(working_dir, "image_02/data/*.png"))
@@ -123,30 +147,29 @@ if __name__ == '__main__':
         labels = assign_labels(pts, T_lidar_to_cam, P_cam, img.shape[1],
                                img.shape[0], detections_2d, labels_to_keep)
 
-        out_dir_obj = "obj/"
-        with open(os.path.join(working_dir, out_dir_obj, "pc_" + name + ".obj"), "w") as fout:
-            for i, p in enumerate(pts):
-                fout.write("v " + " ".join(p.astype(str)) + " " +
-                           " ".join(map(str, labels_colors[labels[i]])) + "\n")
+#        out_dir_obj = "obj/"
+#        with open(os.path.join(working_dir, out_dir_obj, "pc_" + name + ".obj"), "w") as fout:
+#            for i, p in enumerate(pts):
+#                fout.write("v " + " ".join(p.astype(str)) + " " +
+#                           " ".join(map(str, labels_colors[labels[i]])) + "\n")
 
-#    # Write pointcloud with a color per class
-#    header = "ply\n" \
-#             "format ascii 1.0\n" \ labels_to_keep)
-#
-#             "comment VCGLIB generated\n" \
-#             "element vertex " + str(pts.shape[0]) + "\n" \
-#             "property float x\n" \
-#             "property float y\n" \
-#             "property float z\n" \
-#             "property uchar red\n" \
-#             "property uchar green\n" \
-#             "property uchar blue\n" \
-#             "element face 0\n" \
-#             "property list uchar int vertex_indices\n" \
-#             "end_header\n"
-#    out_dir_ply = "ply/"
-#    with open(out_dir_ply + "pc_" + name + ".ply", "w") as fout:
-#        fout.write(header)
-#        for i, p in enumerate(pts):
-#            fout.write(" ".join(p.astype(str)) + " " +
-#                       " ".join(map(str, labels_colors[labels[i]])) + "\n")
+        # Write pointcloud with a color per class
+        header = "ply\n" \
+                 "format ascii 1.0\n" \
+                 "comment VCGLIB generated\n" \
+                 "element vertex " + str(pts.shape[0]) + "\n" \
+                 "property float x\n" \
+                 "property float y\n" \
+                 "property float z\n" \
+                 "property uchar red\n" \
+                 "property uchar green\n" \
+                 "property uchar blue\n" \
+                 "element face 0\n" \
+                 "property list uchar int vertex_indices\n" \
+                 "end_header\n"
+        out_dir_ply = "ply/"
+        with open(os.path.join(working_dir, out_dir_ply, "pc_" + name + ".ply"), "w") as fout:
+            fout.write(header)
+            for i, p in enumerate(pts):
+                fout.write(" ".join(p.astype(str)) + " " +
+                           " ".join(map(str, labels_colors[labels[i]])) + "\n")

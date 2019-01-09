@@ -36,6 +36,11 @@ clustered_pts = []
 for cls in range(max(clustering) + 1):
     clustered_pts.append(pts[clustering == cls, :])
 
+
+
+import matplotlib.pyplot as plt
+
+
 # create a bounding box for each cluster
 bounding_boxes = []
 for points in clustered_pts:
@@ -49,7 +54,70 @@ for points in clustered_pts:
                    [xmax, ymin, zmax],
                    [xmax, ymax, zmax],
                    [xmin, ymax, zmax]])
+#    bounding_boxes.append(bb)
+
+#    plt.figure()
+#    plt.scatter(points[:, 0], points[:, 1])
+#
+#    
+#    pts2d = points[:, :2]
+#    c = pts2d.mean(axis=0)
+#        
+#    plt.ylim(c[1] - 3, c[1] + 3)
+#    plt.xlim(c[0] - 3, c[0] + 3)
+#    
+#    pts2d -= c
+#    res = np.linalg.eig(pts2d.T @ pts2d)
+#
+#    L = res[1][:, 0]
+#    l = res[1][:, 1]
+#    temp = [c]
+#    for i in range(10):
+#        temp.append(c + i * L)
+#        temp.append(c - i * L)
+#    temp = np.vstack(temp)
+#    plt.scatter(temp[:, 0], temp[:, 1])
+#    
+#    temp = [c]
+#    for i in range(10):
+#        temp.append(c + i * l)
+#        temp.append(c - i * l)
+#    temp = np.vstack(temp)
+#    plt.scatter(temp[:, 0], temp[:, 1])
+#
+#    proj_on_L = pts2d @ L
+#    i_min = np.argmin(proj_on_L)
+#    i_max = np.argmax(proj_on_L)
+#    
+#    proj_on_l = pts2d @ l
+#    print(proj_on_l[i_min])
+#    print(proj_on_l[i_max])
+#    proj_on_l -= np.mean(proj_on_l[[i_min, i_max]])
+#    nb_inf = len(np.where(proj_on_l < 0)[0])
+#    nb_sup = len(np.where(proj_on_l > 0)[0])
+#    if nb_inf > nb_sup:
+#        i_mid = np.argmin(proj_on_l)
+#    else:
+#        i_mid = np.argmax(proj_on_l)
+#    
+#    pts2d += c
+#    A = pts2d[i_min, :]
+#    B = pts2d[i_max, :]
+#    C = pts2d[i_mid, :]
+#    
+#    m = (A + B) / 2
+#    D = m + (m - C)
+#    
+#    
+#    bb2d = np.vstack((A, C, B, D))
+#    plt.scatter(bb2d[:, 0], bb2d[:, 1])
+#    
+#    bb = np.vstack((A, C, B, D, A, C, B, D))
+#    bb = np.hstack((bb, np.array([zmin, zmin, zmin, zmin, zmax, zmax, zmax, zmax]).reshape((-1, 1))))
+
+
     bounding_boxes.append(bb)
+
 
 
 # write bounding boxes
