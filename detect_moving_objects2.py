@@ -210,15 +210,6 @@ for i in range(1, len(dyn_vox)):
     # cluster points with DBSCAN
     clustering = DBSCAN(eps=5, min_samples=30).fit_predict(pts)
 
-#    colors = np.random.randint(0, 255, (max(clustering) + 1, 3))
-#    colors = np.vstack((colors, [0, 0, 0]))  # black at then end so that -1 correspond to it
-
-    # save grid clustered with colors
-#    filename = "out2/diff_%04d.obj" % (i)
-#    with open(filename, "w") as fout:
-#        for i, p in enumerate(pts):
-#            fout.write("v " + " ".join(p.astype(str)) + " " +
-#                       " ".join(colors[clustering[i], :].astype(str)) + "\n")
 
     obj_prev_poses = []
     for o in obj_list:
@@ -345,35 +336,24 @@ for i in range(1, len(dyn_vox)):
 #        for i in range(1, npts):
 #            fout.write("3 " + str(2*(i-1)) + " " + str(2*i) + " " + str(2*i-1) + "\n")
 #    
-#%%
-#for i, o in enumerate(obj_list):
-#    if i not in obj_to_skip:
-#        print(i, " => ", len(o.poses.keys()))
-#        frames = sorted(o.poses.keys())
-#        print(frames)
-#        print(frames[0])
-#        print(frames[-1])
-#        print(o.poses[frames[0]])
-#        print(o.poses[frames[-1]])
-#        print(np.sum(np.sqrt((o.poses[frames[0]] - o.poses[frames[-1]])**2)))
-#        if np.sum(np.sqrt((o.poses[frames[0]] - o.poses[frames[-1]])**2)) < 3 * scale_factor:
-#            print("INFERIOR !!!!!!!!!!!!!!!!!!!")
-            
+     
             
 #%%
-kk = 0
-ts = sorted(obj_list[kk].poses.keys())
-pos = []
-for t in ts:
-    pos.append(obj_list[kk].poses[t])
-pos = np.vstack(pos)
-pos /= scale_factor
-d = [0]
-v = [0]
-for i in range(1, pos.shape[0]):
-    d.append(np.sqrt(np.sum((pos[i, :] - pos[i-1, :]) ** 2)))
-    v.append(3600 * (d[-1] / 0.1) / 1000)
     
-pos
-v
-            
+# Analyze speed
+#kk = 0
+#ts = sorted(obj_list[kk].poses.keys())
+#pos = []
+#for t in ts:
+#    pos.append(obj_list[kk].poses[t])
+#pos = np.vstack(pos)
+#pos /= scale_factor
+#d = [0]
+#v = [0]
+#for i in range(1, pos.shape[0]):
+#    d.append(np.sqrt(np.sum((pos[i, :] - pos[i-1, :]) ** 2)))
+#    v.append(3600 * (d[-1] / 0.1) / 1000)
+#    
+#pos
+#v
+#            
