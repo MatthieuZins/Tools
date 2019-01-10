@@ -74,12 +74,14 @@ def distance(pos1, pos2):
 
 class track:
     def __init__(self, color=None):
+        print("Create new track with color : ", color)
         self.poses = {}     # contains frame_id : position
         self.dims = {}      # contains frame_id : dimension
         if color is not None:
             self.color = color
         else:
             self.color = np.random.randint(0, 255, 3)
+        print(self.color)
 
 
     def add_observation(self, frame_id, position, dim):
@@ -185,10 +187,13 @@ def load(filename):
         return tracks_manager()
 
 
-tm = load("/home/matthieu/Dev/Tools/filesave.bin")
-
-
 t = int(input.GetInformation().Get(vtk.vtkDataObject.DATA_TIME_STEP()))
+if t > 0:
+    tm = load("/home/matthieu/Dev/Tools/filesave.bin")
+else:
+    tm = tracks_manager()
+
+
 print "time ", t
 for k in range(max(clustering) + 1):
     center = np.mean(pts[clustering == k, :], axis=0)
@@ -227,23 +232,27 @@ for i in moving_objects:
                    [xmax, ymax, zmax],
                    [xmin, ymax, zmax]])
     bbs.append(bb)
-    lines.InsertNextCell(5)
+    lines.InsertNextCell(16)
     lines.InsertCellPoint(idx + 0)
     lines.InsertCellPoint(idx + 1)
     lines.InsertCellPoint(idx + 2)
     lines.InsertCellPoint(idx + 3)
     lines.InsertCellPoint(idx + 0)
+    lines.InsertCellPoint(idx + 4)
+    lines.InsertCellPoint(idx + 5)
+    lines.InsertCellPoint(idx + 1)
+    lines.InsertCellPoint(idx + 5)
+    lines.InsertCellPoint(idx + 6)
+    lines.InsertCellPoint(idx + 2)
+    lines.InsertCellPoint(idx + 6)
+    lines.InsertCellPoint(idx + 7)
+    lines.InsertCellPoint(idx + 3)
+    lines.InsertCellPoint(idx + 7)
+    lines.InsertCellPoint(idx + 4)
 
-
-    lines.InsertNextCell(5)
-    lines.InsertCellPoint(idx + 4 + 0)
-    lines.InsertCellPoint(idx + 4 + 1)
-    lines.InsertCellPoint(idx + 4 + 2)
-    lines.InsertCellPoint(idx + 4 + 3)
-    lines.InsertCellPoint(idx + 4 + 0)
     idx += 8
 
-    colors.InsertNextTuple3(*track.color)
+    #colors.InsertNextTuple3(*track.color)
     colors.InsertNextTuple3(*track.color)
 
     # line
@@ -254,8 +263,7 @@ for i in moving_objects:
     for j in range(len(positions)):
         lines.InsertCellPoint(idx + j)
     idx += len(positions)
-    colors.InsertNextTuple3(*track.color)
-
+    colors.InsertNextTuple3(track.color[0], track.color[1], track.color[2])
 
 
 if len(bbs) > 0:
