@@ -61,7 +61,7 @@ pts /= scale_factor
 
 
 from sklearn.cluster import DBSCAN
-clustering = DBSCAN(eps=5, min_samples=30).fit_predict(pts)
+clustering = DBSCAN(eps=0.5, min_samples=30).fit_predict(pts)
 
 
 lines = vtk.vtkCellArray()
