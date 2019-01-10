@@ -253,8 +253,7 @@ for i in moving_objects:
 
     idx += 8
 
-    #colors.InsertNextTuple3(*track.color)
-    colors.InsertNextTuple3(*track.color)
+    colors.InsertNextTuple3(track.color[0], track.color[1], track.color[2])
 
     # line
     positions = [track.poses[fid] for fid in sorted(track.poses.keys())]
