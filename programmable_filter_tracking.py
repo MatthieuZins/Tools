@@ -9,27 +9,30 @@ pts0 = numpy_support.vtk_to_numpy(p0.GetPoints().GetData()).copy()
 pts1 = numpy_support.vtk_to_numpy(p1.GetPoints().GetData()).copy()
 
 
-x_full = 20     # this is in m
-y_half = 20     # this is in m
-z_half = 1      # this is in m
+x_bounds = [-20, 30]    # [min, max[ in meters
+y_bounds = [-40, 40]
+z_bounds = [-1, 1]
 
 scale_factor = 10
 
-x_full *= scale_factor
-y_half *= scale_factor
-z_half *= scale_factor
+x_bounds[0] *= scale_factor
+x_bounds[1] *= scale_factor
+y_bounds[0] *= scale_factor
+y_bounds[1] *= scale_factor
+z_bounds[0] *= scale_factor
+z_bounds[1] *= scale_factor
 
-x_range = x_full
-y_range = y_half * 2
-z_range = z_half * 2
+x_range = x_bounds[1] - x_bounds[0]
+y_range = y_bounds[1] - y_bounds[0]
+z_range = z_bounds[1] - z_bounds[0]
 
 
 grid0 = np.zeros((x_range, y_range, z_range))
 pts0 = pts0[:, :3] * scale_factor
-pts0 += [0, y_half, z_half]
-pts0 = np.round(pts0).astype(int)
+pts0 -= [x_bounds[0], y_bounds[0], z_bounds[0]]
+pts0 = np.floor(pts0).astype(int)
 pts0 = pts0[pts0[:, 0] >= 0]
-pts0 = pts0[pts0[:, 0] < x_full]
+pts0 = pts0[pts0[:, 0] < x_range]
 pts0 = pts0[pts0[:, 1] >= 0]
 pts0 = pts0[pts0[:, 1] < y_range]
 pts0 = pts0[pts0[:, 2] >= 0]
@@ -40,10 +43,10 @@ grid0[pts0[:, 0], pts0[:, 1], pts0[:, 2]] = 1
 
 grid1 = np.zeros((x_range, y_range, z_range))
 pts1 = pts1[:, :3] * scale_factor
-pts1 += [0, y_half, z_half]
-pts1 = np.round(pts1).astype(int)
+pts1 -= [x_bounds[0], y_bounds[0], z_bounds[0]]
+pts1 = np.floor(pts1).astype(int)
 pts1 = pts1[pts1[:, 0] >= 0]
-pts1 = pts1[pts1[:, 0] < x_full]
+pts1 = pts1[pts1[:, 0] < x_range]
 pts1 = pts1[pts1[:, 1] >= 0]
 pts1 = pts1[pts1[:, 1] < y_range]
 pts1 = pts1[pts1[:, 2] >= 0]
@@ -56,7 +59,7 @@ xx, yy, zz = np.where(diff == 1)
 pts = np.vstack((xx, yy, zz)).T
 pts = np.ascontiguousarray(pts, dtype=np.float32)
 
-pts -= [0, y_half, z_half]
+pts += [x_bounds[0], y_bounds[0], z_bounds[0]]
 pts /= scale_factor
 
 
@@ -68,20 +71,20 @@ clustering = DBSCAN(eps=0.9, min_samples=30).fit_predict(pts)
 import numpy as np
 import os
 
+THRESHOLD_TRACKS_ASSOCIATION = 3
+
 def distance(pos1, pos2):
     return np.sqrt(np.sum((np.array(pos1) - np.array(pos2)) ** 2))
 
 
 class track:
     def __init__(self, color=None):
-        print("Create new track with color : ", color)
         self.poses = {}     # contains frame_id : position
         self.dims = {}      # contains frame_id : dimension
         if color is not None:
             self.color = color
         else:
             self.color = np.random.randint(0, 255, 3)
-        print(self.color)
 
 
     def add_observation(self, frame_id, position, dim):
@@ -112,10 +115,8 @@ class track:
         return total
 
 class tracks_manager:
-    def __init__(self, treshold_tracks_association=2):
+    def __init__(self):
         self.tracks = []
-        self.THRESHOLD_TRACKS_ASSOCIATION = treshold_tracks_association
-        pass
 
     def add_observation(self, frame_id, position, dim):
         BIG_NUMBER = 999999999
@@ -129,7 +130,7 @@ class tracks_manager:
         if len(dist_to_prev) > 0:
             dist_min_i = np.argmin(dist_to_prev)
             dist_min = dist_to_prev[dist_min_i]
-        if dist_min > self.THRESHOLD_TRACKS_ASSOCIATION:
+        if dist_min > THRESHOLD_TRACKS_ASSOCIATION:
             self.tracks.append(track())  # add a new track
             dist_min_i = len(self.tracks) - 1
         self.tracks[dist_min_i].add_observation(frame_id, position, dim)
