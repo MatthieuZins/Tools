@@ -2,8 +2,8 @@ import numpy as np
 import os
 
 # Parameters
-TEMPORARY_FILE = "/home/matthieu/Dev/Tools/tracking_temp_save.npy"
-THRESHOLD_TRACKS_ASSOCIATION = 3
+TEMPORARY_FILE = "/home/matthieu/Dev/Tools/tracking_temp_save.npy"      # temporary file used to keep the tracker state between filter calls
+THRESHOLD_TRACKS_ASSOCIATION = 3                                        # maximum distance for track association
 
 x_bounds = [0, 30]    # [min, max[ in meters
 y_bounds = [-40, 40]
@@ -30,8 +30,6 @@ class track:
 
 
     def add_observation(self, frame_id, position, dim):
-        if frame_id in self.poses.keys():
-            print("Warning: a position is already known for this object at this frame.")
         self.poses[frame_id] = position
         self.dims[frame_id] = dim
 
@@ -148,9 +146,9 @@ def run_tracking(pts0, pts1, t):
     """ main algorithm """
     if t == 0 or pts0 is None or pts1 is None:
         if os.path.exists(TEMPORARY_FILE):
-                print "delete temporary file"
-                os.remove(TEMPORARY_FILE)
-        return None
+            print "delete temporary file"
+            os.remove(TEMPORARY_FILE)
+        return None,  None, None
 
     # Detect moving objects
     x_bounds[0] *= scale_factor
@@ -217,7 +215,6 @@ def run_tracking(pts0, pts1, t):
         xsize = max(xmax - center[0], center[0] - xmin)
         ysize = max(ymax - center[1], center[1] - ymin)
         zsize = max(zmax - center[2], center[2] - zmin)
-        #print "new observation ", t
         tm.add_observation(t, center, [xsize, ysize, zsize]) ## frame id 
 
     # save track manager
