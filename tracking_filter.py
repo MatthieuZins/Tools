@@ -5,11 +5,14 @@ import os
 TEMPORARY_FILE = "/home/matthieu/Dev/Tools/tracking_temp_save.npy"      # temporary file used to keep the tracker state between filter calls
 THRESHOLD_TRACKS_ASSOCIATION = 3                                        # maximum distance for track association
 
+MAX_DIST_FOR_CLUSTERING = 0.9            # max distance for points to be considered in the same neighbourhood
+MIN_SAMPLES_FOR_CLUSTERING = 30          # the number of samples in a neighbourhood for a point to be considered as a core point
+
 x_bounds = [0, 30]    # [min, max[ in meters
 y_bounds = [-40, 40]
 z_bounds = [-1, 1]
 
-scale_factor = 10
+scale_factor = 10     # scale factor for the voxel grid (voxel size is 1/scale_factor)
 
 
 
@@ -199,7 +202,7 @@ def run_tracking(pts0, pts1, t):
 
 
     from sklearn.cluster import DBSCAN
-    clustering = DBSCAN(eps=0.9, min_samples=30).fit_predict(pts)
+    clustering = DBSCAN(eps=MAX_DIST_FOR_CLUSTERING, min_samples=MIN_SAMPLES_FOR_CLUSTERING).fit_predict(pts)
 
 
 
