@@ -17,7 +17,7 @@ if p0 is not None and p1 is not None:
     pts1 = numpy_support.vtk_to_numpy(p1.GetPoints().GetData())
 
 # run tracking
-pts, lines, colors = programmable_filter_tracking.run_algo(pts0, pts1, t)
+pts, lines, colors = programmable_filter_tracking.run_tracking(pts0, pts1, t)
 
 
 if pts is not None and lines is not None and colors is not None:
