@@ -1,9 +1,6 @@
 from vtk.util import numpy_support
-import os
-import numpy as np
 import programmable_filter_tracking
 reload(programmable_filter_tracking)
-
 
 
 inp = self.GetInput()
@@ -12,8 +9,15 @@ p1 = inp.GetBlock(1)
 
 t = int(inp.GetInformation().Get(vtk.vtkDataObject.DATA_TIME_STEP()))
 
+# transform PolyData to Numpy array
+pts0 = None
+pts1 = None
+if p0 is not None and p1 is not None:
+    pts0 = numpy_support.vtk_to_numpy(p0.GetPoints().GetData())
+    pts1 = numpy_support.vtk_to_numpy(p1.GetPoints().GetData())
 
-pts, lines, colors = programmable_filter_tracking.run_algo(p0, p1, t)
+# run tracking
+pts, lines, colors = programmable_filter_tracking.run_algo(pts0, pts1, t)
 
 
 if pts is not None and lines is not None and colors is not None:

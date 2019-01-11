@@ -1,23 +1,13 @@
-def run_algo(p0, p1, t):
-
-    # transform polydata to numpy points
+def run_algo(pts0, pts1, t):
     import numpy as np
-    from paraview.vtk.util import numpy_support
-    from paraview import vtk
     import os
 
 
-    if t == 0 and os.path.exists("/home/matthieu/Dev/Tools/filesave.bin.npy"):
-        print "remove filesave"
-        os.remove("/home/matthieu/Dev/Tools/filesave.bin.npy")
+    if t == 0 or pts0 is None or pts1 is None:
+        if os.path.exists("/home/matthieu/Dev/Tools/filesave.bin.npy"):
+                print "remove filesave"
+                os.remove("/home/matthieu/Dev/Tools/filesave.bin.npy")
         return None
-
-    if p0 is None or p1 is None:
-        return None
-
-    pts0 = numpy_support.vtk_to_numpy(p0.GetPoints().GetData()).copy()
-    pts1 = numpy_support.vtk_to_numpy(p1.GetPoints().GetData()).copy()
-
 
     x_bounds = [0, 30]    # [min, max[ in meters
     y_bounds = [-40, 40]
